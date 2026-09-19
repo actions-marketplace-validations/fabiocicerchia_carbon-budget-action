@@ -24,6 +24,23 @@ decision instead of a silent drift.
 ```
 
 ```markdown
+## Features
+
+- Fails a build when a deployment's estimated monthly carbon exceeds a
+  **gCO2e budget** you set — bundle-size checks, but for carbon.
+- Makes scaling past the budget a reviewed decision rather than a silent
+  drift: replicas, CPU and memory requests all feed the estimate.
+- `mode: report` posts the estimate **without ever failing the build** — the
+  adoption on-ramp before you turn the gate on.
+- Posts a markdown summary with the figure, the budget, the percentage used
+  and a progress bar.
+- `grid-intensity` prices the same workload against the region it actually
+  runs in (default 480, the world average).
+- Explainable model — Cloud Carbon Footprint methodology, ~4 W per CPU core,
+  0.4 W per GB RAM, PUE 1.2 — with every constant at the top of
+  `carbon_budget.py` rather than buried.
+- Nothing to install: reference it from a workflow with `uses:`.
+
 ## 🌍 Carbon budget check
 Estimated: **3,110 gCO2e** / budget 5,000 gCO2e (62%) ✅ within budget
 `████████████`
@@ -63,7 +80,28 @@ Full docs live in [`docs/`](docs/); runnable examples in [`examples/`](examples/
 
 ## Development
 
-`make setup` (hooks) then `make dev`, `make test`, `make lint`.
+`make setup` installs the dev dependencies and the pre-commit hook; `make
+help` lists every target. Every repository in this estate exposes the same
+eight verbs, so you do not have to read a Makefile to find out how to test it
+(FC-GEN-057).
+
+| Verb      | What it does here                                   |
+| --------- | --------------------------------------------------- |
+| `setup`   | `requirements-dev.txt` + the pre-commit hook        |
+| `run`     | The estimator locally: `BUDGET_GCO2E=5000 make run` |
+| `test`    | `pytest -q`                                         |
+| `lint`    | `pre-commit run --all-files` — the whole gate       |
+| `format`  | `ruff format .`                                     |
+| `analyze` | `trivy fs` — vulnerabilities, misconfig, secrets    |
+
+### Not applicable
+
+Two verbs have no meaning for a composite action. They exit 0 and say why
+rather than pretending to work (FC-GEN-058):
+
+- `install` — consumers name this action in a workflow step.
+- `build` — `action.yml` runs `carbon_budget.py` straight from the checkout.
+
 See [CONTRIBUTING.md](CONTRIBUTING.md) and the
 [Code of Conduct](CODE_OF_CONDUCT.md).
 

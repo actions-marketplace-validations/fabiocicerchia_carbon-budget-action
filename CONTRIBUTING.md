@@ -9,13 +9,15 @@ You need Python 3.10+ and `make`. The action is a composite GitHub Action
 (`action.yml`) that wraps `carbon_budget.py`.
 
 1. Fork and clone the repo.
-2. `make setup` — install git hooks + pre-commit.
-3. `make dev` — install dev tooling (pytest, ruff, requests).
-4. Create a branch: `git checkout -b feat/short-description`.
+1. `make setup` — dev dependencies from `requirements-dev.txt`, plus the
+   pre-commit hook.
+1. Create a branch: `git checkout -b feat/short-description`.
 
 ```sh
-make lint    # ruff check .
+make lint    # pre-commit run --all-files — the whole gate
 make test    # pytest -q
+make format  # ruff format .
+make run     # BUDGET_GCO2E=5000 make run
 ```
 
 To try the action end-to-end, push a branch and let the `self-test` job in
@@ -45,9 +47,9 @@ Releases are automated by
 changelog manually.
 
 1. Merge `feat:`/`fix:` PRs into `main` as normal — **no tag is created**.
-2. release-please keeps an open **release PR** ("chore: release X.Y.Z"),
+1. release-please keeps an open **release PR** ("chore: release X.Y.Z"),
    recalculating the next version + `CHANGELOG.md` on every merge.
-3. Merging that release PR creates the `vX.Y.Z` tag and GitHub Release, and the
+1. Merging that release PR creates the `vX.Y.Z` tag and GitHub Release, and the
    workflow moves the floating major tag (e.g. `v1`) so consumers can pin
    `uses: fabiocicerchia/carbon-budget-action@v1`.
 
